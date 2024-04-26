@@ -16,9 +16,9 @@ library("quarto")
 # Creating directories
 
 ```{r}
-dir.create("../data/_raw", recursive = TRUE)
-dir.create("../results")
-dir.create("../doc")
+dir.create("/data/_raw", recursive = TRUE)
+dir.create("/results")
+dir.create("/doc")
 ```
 
 ```{r}
