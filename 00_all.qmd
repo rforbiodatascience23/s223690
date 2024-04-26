@@ -7,12 +7,14 @@ editor: visual
 ---
 
 # Load packages
+
 ```{r}
 library("tidyverse")
 library("quarto")
 ```
 
 # Creating directories
+
 ```{r}
 dir.create("../data/_raw", recursive = TRUE)
 dir.create("../results")
