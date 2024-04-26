@@ -19,6 +19,7 @@ library("quarto")
 dir.create("data/_raw", recursive = TRUE)
 dir.create("results")
 dir.create("doc")
+dir.create("R")
 ```
 
 ```{r}
