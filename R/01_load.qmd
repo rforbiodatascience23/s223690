@@ -31,6 +31,7 @@ download.file(original_path, destination_file, method = "auto")
 
 #Transform the file from csv to tsv
 ```{r}
+#This code separates the data with tabs and not comas
 raw_data <- read_csv(destination_file)
 raw_data <- write_delim(raw_data, 
                         file= "../data/_raw/Arsenic_Cancer_Final_2020Sept2.tsv",      

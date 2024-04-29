@@ -9,9 +9,23 @@ editor: visual
 # Load libraries
 
 ```{r Load libraries}
-library("tidyverse")
+library(tidyverse)
 ```
 
-```{r Keep }
+# Read the data file
+
+```{r}
+raw_data <- read_delim("../data/_raw/Arsenic_Cancer_Final_2020Sept2.tsv", delim = "\t", show_col_types = FALSE)
+```
+
+#Rename the columns
+
+```{r}
+colnames(raw_data)[colnames(raw_data) == "County"] <- "City"
+colnames(raw_data)[colnames(raw_data) == "Population_Served"] <- "Population_Count"
+colnames(raw_data)[colnames(raw_data) == "Total_CWS_County"] <- "CWS_City"
+colnames(raw_data)[colnames(raw_data) == "Percent_Same_County_Residence_At_Least_5_Years"] <- "Percent_Same_City_Residence_At_Least_5_Years"
+
+raw_data$Percent_Female <- 100 - raw_data$Percent_Male
 ```
 
