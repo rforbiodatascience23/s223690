@@ -33,7 +33,7 @@ download.file(original_path, destination_file, method = "auto")
 ```{r}
 raw_data <- read_csv(destination_file)
 raw_data <- write_delim(raw_data, 
-                        file= 'Arsenic_Cancer_Final_2020Sept2.tsv',      
+                        file= "../data/_raw/Arsenic_Cancer_Final_2020Sept2.tsv",      
                              delim = "\t", col_names = TRUE)
 ```
 
