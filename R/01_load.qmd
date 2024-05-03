@@ -18,9 +18,9 @@ library(readxl)
 
 ```{r}
 #raw.githubusercontent.com is needed so we make sure that we are downloading the raw file
-original_path <- "https://raw.githubusercontent.com/Masaam2000/Data_reexam/main/Arsenic_Cancer_Final_2020Sept2.csv"
+original_path <- "https://raw.githubusercontent.com/Masaam2000/Data_reexam/main/citotoxicity_genes_breast_cancer.csv"
 
-destination_file <- "../data/_raw/Arsenic_Cancer_Final_2020Sept2.csv"
+destination_file <- "../data/_raw/citotoxicity_genes_breast_cancer.csv"
 ```
 
 # Download the file
@@ -35,6 +35,6 @@ download.file(original_path, destination_file, method = "auto")
 #This code separates the data with tabs and not comas
 raw_data <- read_csv(destination_file)
 raw_data <- write_delim(raw_data, 
-                        file= "../data/_raw/Arsenic_Cancer_Final_2020Sept2.tsv",      
+                        file= "../data/_raw/citotoxicity_genes_breast_cancer.tsv",      
                              delim = "\t", col_names = TRUE)
 ```

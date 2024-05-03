@@ -1,0 +1,97 @@
+---
+title: "02_clean"
+format:
+  html:
+    embed-resources: true
+editor: visual
+---
+
+# Load libraries
+
+```{r Load libraries}
+library(tidyverse)
+```
+
+# Read the data file
+
+```{r}
+raw_data <- read_delim("../data/_raw/Arsenic_Cancer_Final_2020Sept2.tsv", delim = "\t", show_col_types = FALSE)
+```
+
+#Rename the columns
+
+```{r}
+colnames(raw_data)[colnames(raw_data) == "County"] <- "City"
+colnames(raw_data)[colnames(raw_data) == "Population_Served"] <- "Population_Count"
+colnames(raw_data)[colnames(raw_data) == "Total_CWS_County"] <- "CWS_City"
+colnames(raw_data)[colnames(raw_data) == "Percent_Same_County_Residence_At_Least_5_Years"] <- "Percent_Same_City_Residence_At_Least_5_Years"
+colnames(raw_data)[colnames(raw_data) == "FIPS"] <- "ID"
+```
+
+
+```{r Addition of new columns}
+raw_data$Percent_Female <- 100 - raw_data$Percent_Male
+raw_data <- raw_data %>% relocate(Percent_Female, .after = Percent_Male)
+
+raw_data$percent_bladder_cancer <- (raw_data$Bladder_Count / raw_data$Population_Count) * 100
+
+raw_data$percent_bladder_cancer <- round(raw_data$percent_bladder_cancer, 2)
+
+```
+
+
+```{r}
+#Keep specific columns from the data set
+columns_to_keep <- c("ID", "State", "City", "Population_Count", "Bladder_Count", "Colorectal_Count", "Kidney_Count", "CWS_City", "Percent_Male", "Percent_Female", "Percent_Same_City_Residence_At_Least_5_Years", "Percent_Ever_Had_Endoscopy", "Percent_Ever_Smoked", "EQI_AIR", "EQI_WATER", "EQI_LAND", "EQI_SD", "EQI_BUILT", "EQI_OVERALL")
+
+selected_data <- raw_data |> select(all_of(columns_to_keep))
+```
+
+```{r}
+#Check if there are NaN or na values in the data set
+nan_counts <- colSums(is.na(selected_data))
+```
+
+```{r}
+#Create a list of cities that the study was done
+cities <- unique(selected_data$City)
+state <- unique(selected_data$State)
+
+```
+
+```{r}
+states_west_coast <- c("Washington", "Orgeon", "Nevada", "California", "Alaska", "Hawaii")
+
+states_south_west <- c("Utah", "Colorado", "Arizona", "New Mexico", "Texas", "Oklahoma")
+
+states_mid_west <- c("Idaho", "Nebraska", "Montana", "Wyoming", "North Dakota", "South Dakota", "Nebraska", "Kansas") 
+
+states_great_lakes <- c("Minnesota", "Iowa", "Missouri", "Wisconsin", "Illinois", "Indiana", "Michigan", "Ohio")
+
+states_south <- c("Arkansas", "Lousiana", "Missisipi", "Alabama", "Georgia", "Florida", "South Carolina", "Tennesse", "North Carolina")
+
+states_east_coast <- c("Pennsylvania", "Virginia", "West Virginia", "Kentucky", "Distict of Columbia", "Maryland")
+
+states_new_england <- c("Delaware", "New Jersey", "Conneticut", "Rhode Island", "New York", "Massachusetts", "Vermont", "New Hampshire", "Maine")
+```
+
+```{r}
+# Create a new data set that group all the information of the cancer count
+data_grouping_state <- raw_data %>%
+  group_by(State) %>%
+  summarise(total_population = sum(Population_Count, na.rm = TRUE),
+            bladder_count_state = sum(Bladder_Count, na.rm = T),
+            colorectal_count_state = sum(Colorectal_Count, na.rm = T),
+            kidney_count_state = sum(Kidney_Count, na.rm = T))
+
+#Add new columns with the percentage of the counts comparing the total population tested
+data_grouping_state$percent_bladder_count_state <- (data_grouping_state$bladder_count_state / data_grouping_state$total_population) * 100
+data_grouping_state$percent_bladder_count_state <- round(data_grouping_state$percent_bladder_count_state, 2)
+
+data_grouping_state$percent_colorectal_count_state <- (data_grouping_state$colorectal_count_state / data_grouping_state$total_population) * 100
+data_grouping_state$percent_colorectal_count_state <- round(data_grouping_state$percent_colorectal_count_state, 2)
+
+data_grouping_state$percent_kidney_count_state <- (data_grouping_state$kidney_count_state / data_grouping_state$total_population) * 100
+data_grouping_state$percent_kidney_count_state <- round(data_grouping_state$percent_kidney_count_state, 2)
+```
+
