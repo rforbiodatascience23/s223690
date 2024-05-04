@@ -15,6 +15,8 @@ library(DESeq2)
 
 library(RColorBrewer)
 library(pheatmap)
+library(viridis)
+library(EnhancedVolcano)
 
 
 ```
@@ -132,7 +134,74 @@ pheatmap_distances <- pheatmap(sampleDistMatrix,
 plotPCA(vst)
 ```
 
-```{r}
+```{r Heatmap}
+#Just consider the genes that were DE ans VST
+de_genes_names <- unique(c(rownames(de_genes)))
 
+de_genes_vst <- vst[rownames(vst) %in% de_genes_names, ]
+
+de_genes_vst_matrix <- assay(de_genes_vst)
+
+
+#Calculate the z-score
+z_scores <- scale(de_genes_vst_matrix)
+
+# Define breaks and labels for the quantile scale (putting the function, it doesn't really matter the name of the variable)
+quantile_breaks <- function(z_scores, n = 10) {
+  breaks <- quantile(z_scores, probs = seq(0, 1, length.out = n), na.rm = TRUE)
+  breaks[!duplicated(breaks)]
+}
+
+breaks <- quantile_breaks(z_scores, n = 11)
+
+# Create a heatmap using pheatmap with a specified color palette
+#jpeg("pheatmap_of_expression.jpeg")
+
+pheatmap(t(z_scores),
+         #annotation_row = annotation_row_4,
+         cluster_rows = TRUE,
+         cluster_cols = TRUE,
+         main = "Heatmap z-score od DE genes",
+         breaks = breaks,
+         color = inferno(10),
+         fontsize_row = 8,
+         show_colnames = FALSE,
+         border_color = "NA",
+
+)
+
+#dev.off()
+```
+
+```{r Volcano plot of DE genes}
+volcano_plot_data <- as.data.frame(res)
+
+#See what are the maximum and minimum values for the plot
+max_log2_volcano_plot <- max(volcano_plot_data$log2FoldChange)
+min_log2_volcano_plot <- min(volcano_plot_data$log2FoldChange)
+
+max_pvalue_volcano_plot <- max(-log10(volcano_plot_data$pvalue))
+min_pvalue_volcano_plot <- min(-log10(volcano_plot_data$pvalue))
+
+
+#Create the volcano plot (log2Fold change = 3, pvalue < 0.1)
+
+#jpeg("volcano_plot.jpeg", res = 100)
+EnhancedVolcano(volcano_plot_data,
+                lab = row.names(volcano_plot_data),
+                labSize = 4,
+                x = "log2FoldChange",
+                xlim = c(min_log2_volcano_plot, max_log2_volcano_plot),
+                y = "padj",
+                ylim = c(min_pvalue_volcano_plot, max_pvalue_volcano_plot),
+                pCutoff = 0.1,
+                FCcutoff = 3,
+                axisLabSize = 12,
+                caption = NULL,
+                subtitle = NULL,
+                legendPosition = "none",
+                title = "Volcano plot"
+                )
+#dev.off()
 ```
 

@@ -1,0 +1,148 @@
+---
+title: "02_clean"
+format:
+  html:
+    embed-resources: true
+editor: visual
+---
+
+
+# Load libraries
+
+
+```{r Load libraries}
+library(tidyverse)
+library(DESeq2)
+
+
+library(RColorBrewer)
+library(pheatmap)
+
+
+```
+
+
+# Read the data file
+
+
+```{r Set the working directory and read the data file}
+setwd("C:/Users/marin/OneDrive/Documentos/GitHub/s223690/R")
+raw_data <- read_delim("../data/_raw/citotoxicity_genes_breast_cancer.tsv", delim = "\t", show_col_types = FALSE)
+```
+
+
+#Rename the columns
+
+
+```{r Rename the columns}
+# Sample list
+list <- c("Genes", "GSM5574685	tumor rep1", "GSM5574686 tumor rep2", "GSM5574687 tumor rep3", "GSM5574688 tumor rep4", "GSM5574689 tumor rep5", "GSM5574690 tumor rep6", "GSM5574691 tumor rep7", "GSM5574692 tumor rep8", "GSM5574693 tumor rep9", "GSM5574694 tumor rep10", "GSM5574695 tumor rep11", "GSM5574696 tumor rep12", "GSM5574697 tumor rep13", "GSM5574698 tumor rep14", "GSM5574699 tumor rep15",  "GSM5574700 tumor rep16", "GSM5574701 tumor rep17", "GSM5574702 tumor rep18", "GSM5574703 tumor rep19", "GSM5574704 tumor rep20", "GSM5574705 tumor rep21", "GSM5574706 tumor rep22", "GSM5574707 tumor rep23", "GSM5574708 tumor rep24", "GSM5574709 tumor rep25", "GSM5574710 tumor rep26", "GSM5574711 tumor rep27", "GSM5574712 tumor rep28", "GSM5574713 tumor rep29", "GSM5574714 tumor rep30", "GSM5574715 normal rep1", "GSM5574716 normal rep2", "GSM5574717 normal rep3", "GSM5574718 normal rep4", "GSM5574719 normal rep5", "GSM5574720 normal rep6", "GSM5574721 normal rep7", "GSM5574722 normal rep8", "GSM5574723 normal rep9", "GSM5574724 normal rep10", "GSM5574725 normal rep11", "GSM5574726 normal rep12",  "GSM5574727 normal rep13", "GSM5574728 normal rep14", "GSM5574729 normal rep15", "GSM5574730 normal rep16", "GSM5574731 normal rep17", "GSM5574732 normal rep18", "GSM5574733 normal rep19", "GSM5574734 normal rep20", "GSM5574735 normal rep21", "GSM5574736 normal rep22", "GSM5574737 normal rep23", "GSM5574738 normal rep24", "GSM5574739 normal rep25", "GSM5574740 normal rep26", "GSM5574741 normal rep27", "GSM5574742 normal rep28", "GSM5574743 normal rep29", "GSM5574744 normal rep30")
+
+# Remove words that start with "GSM" so we have the actual names
+new_column_names <- gsub("\\bGSM\\w+\\s*", "", list)
+
+new_column_names <- gsub(" ", "_", new_column_names)
+
+
+# Print the cleaned list
+print(new_column_names)
+
+#Change the name of the columns with this one
+colnames(raw_data) <- new_column_names
+
+# Set the first column (gene names) as rownames
+raw_data <- as.data.frame(raw_data)
+rownames(raw_data) <- raw_data[, 1]
+raw_data <- raw_data[, -1]
+```
+
+```{r Check if there are na values in the data set}
+#Check if there are NaN or na values in the data set
+nan_counts <- unique(colSums(is.na(raw_data)))
+```
+
+
+#Start the DESeq analysis
+
+
+```{r Create the DESeq input (DESeq matrix)}
+# Set the sample names
+sample_names <- colnames(raw_data)
+
+# Set the sample conditions
+sample_condition <- strsplit(sample_names, "_")
+sample_condition <- sapply(sample_condition, function(x) x[1])
+
+# Create a data frame with sample information
+DESeq_matrix <- data.frame(sampleName = sample_names, 
+                           fileName = t(raw_data),
+                           condition = sample_condition)
+
+#Set the conditions so we can perform DESeq2 afterwards
+# Convert raw_data to a matrix
+count_matrix <- as.matrix(raw_data)
+
+# Create a DESeqDataSet object. The round(count_matrix) help to have non-negative integers.
+dds <- DESeqDataSetFromMatrix(countData = round(count_matrix),
+                              colData = DESeq_matrix,
+                              design = ~ condition)
+
+#Get rid of the genes that have very low count
+dds <- dds[ rowSums(counts(dds)) > 10, ]
+```
+
+```{r Perform DESeq2 analysis of the normalised counts}
+# Run DESeq2 analysis
+dds <- DESeq(dds)
+
+# Extract differential expression results
+res <- results(dds)
+res <- data.frame(res)
+```
+
+```{r Check the DE genes}
+#Get the differentially expressed genes
+de_genes <- subset(res, padj < 0.1)
+de_genes <- subset(de_genes, log2FoldChange > 3 | log2FoldChange < -3)
+de_genes <- subset(de_genes, !is.na(padj))
+```
+
+
+#Visual representation
+
+
+```{r plotMA}
+# 4. Visualize results
+#plotMA(res)
+```
+
+```{r VST and PCA plot}
+#VST for the PCA plot
+dds <- estimateSizeFactors(dds)
+
+vst <- vst(dds, blind = FALSE)
+
+sampleDists <- dist(t(assay(vst)))
+
+#PHeatMap with the distances
+sampleDistMatrix <- as.matrix(sampleDists)
+
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+
+#jpeg("distance_heatmap.jpeg")
+
+pheatmap_distances <- pheatmap(sampleDistMatrix, 
+                               clustering_distance_rows = sampleDists, 
+                               clustering_distance_cols = sampleDists, 
+                               col = colors,
+                               main = "Heatmap of sample-to-sample distances using the variance stabilizing transformed values")
+
+#dev.off()
+
+plotPCA(vst)
+```
+
+```{r}
+
+```
+
