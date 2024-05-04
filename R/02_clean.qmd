@@ -207,29 +207,25 @@ EnhancedVolcano(volcano_plot_data,
 #dev.off()
 ```
 
-```{r GO enrichment timepoint 24}
+```{r GO enrichment}
 #Perform the GO enrichment with a Biological Pathway pov
-GO_results <- enrichGO(gene = de_genes, OrgDb = "org.Hs.eg.db", keyType = "ENSEMBL", ont = "BP")
+GO_results <- enrichGO(gene = rownames(de_genes), OrgDb = "org.Hs.eg.db", keyType = "SYMBOL", ont = "BP")
 
 #Filter depending on the gene count per pathway is not <5
-GO_results_np_vs_nn_24_filtered <- filter(GO_results_np_vs_nn_24, Count >5)
+GO_results_filtered <- filter(GO_results, Count >5)
 
 
 #Transform the output into a data frame
-GO_results_np_vs_nn_24_data_frame <- as.data.frame(GO_results_np_vs_nn_24_filtered)
+GO_results_data_frame <- as.data.frame(GO_results_filtered)
 
 #Plot pp vs. nn timepoint 24
-GO_results_pp_vs_nn_24_plot <- plot(barplot(GO_results_pp_vs_nn_24_filtered, 
-                                           showCategory = 20,
-                                           title = "GO",
-                                           font.size = 5))
+GO_results <- plot(barplot(GO_results_filtered, 
+                                           showCategory = 10,
+                                           title = "GO of the DE genes",
+                                           font.size = 10))
 
-png("GO_results.png", res =250, width = 1000, height = 1300)
-print(GO_results_pp_vs_nn_24_plot)
-dev.off()
-
-#png("GO_results_np_vs_nn_24_plot.png", res =250, width = 1000, height = 1300)
-#print(GO_results_np_vs_nn_24_plot)
+#png("GO_results.png", res =250, width = 1000, height = 1300)
+print(GO_results)
 #dev.off()
 ```
 
