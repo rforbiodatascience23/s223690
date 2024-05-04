@@ -18,7 +18,9 @@ library(pheatmap)
 library(viridis)
 library(EnhancedVolcano)
 
-
+library(clusterProfiler)
+library(AnnotationDbi)
+library(org.Hs.eg.db)
 ```
 
 # Read the data file
@@ -163,7 +165,7 @@ pheatmap(t(z_scores),
          cluster_cols = TRUE,
          main = "Heatmap z-score od DE genes",
          breaks = breaks,
-         color = inferno(10),
+         color = viridis(10),
          fontsize_row = 8,
          show_colnames = FALSE,
          border_color = "NA",
@@ -202,6 +204,32 @@ EnhancedVolcano(volcano_plot_data,
                 legendPosition = "none",
                 title = "Volcano plot"
                 )
+#dev.off()
+```
+
+```{r GO enrichment timepoint 24}
+#Perform the GO enrichment with a Biological Pathway pov
+GO_results <- enrichGO(gene = de_genes, OrgDb = "org.Hs.eg.db", keyType = "ENSEMBL", ont = "BP")
+
+#Filter depending on the gene count per pathway is not <5
+GO_results_np_vs_nn_24_filtered <- filter(GO_results_np_vs_nn_24, Count >5)
+
+
+#Transform the output into a data frame
+GO_results_np_vs_nn_24_data_frame <- as.data.frame(GO_results_np_vs_nn_24_filtered)
+
+#Plot pp vs. nn timepoint 24
+GO_results_pp_vs_nn_24_plot <- plot(barplot(GO_results_pp_vs_nn_24_filtered, 
+                                           showCategory = 20,
+                                           title = "GO",
+                                           font.size = 5))
+
+png("GO_results.png", res =250, width = 1000, height = 1300)
+print(GO_results_pp_vs_nn_24_plot)
+dev.off()
+
+#png("GO_results_np_vs_nn_24_plot.png", res =250, width = 1000, height = 1300)
+#print(GO_results_np_vs_nn_24_plot)
 #dev.off()
 ```
 
