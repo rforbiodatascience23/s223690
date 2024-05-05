@@ -59,56 +59,8 @@ raw_data <- raw_data[, -1]
 nan_counts <- unique(colSums(is.na(raw_data)))
 ```
 
-#Start the DESeq analysis
-
-```{r Create the DESeq input (DESeq matrix)}
-# Set the sample names
-sample_names <- colnames(raw_data)
-
-# Set the sample conditions
-sample_condition <- strsplit(sample_names, "_")
-sample_condition <- sapply(sample_condition, function(x) x[1])
-
-# Create a data frame with sample information
-DESeq_matrix <- data.frame(sampleName = sample_names, 
-                           fileName = t(raw_data),
-                           condition = sample_condition)
-
-#Set the conditions so we can perform DESeq2 afterwards
-# Convert raw_data to a matrix
-count_matrix <- as.matrix(raw_data)
-
-# Create a DESeqDataSet object. The round(count_matrix) help to have non-negative integers.
-dds <- DESeqDataSetFromMatrix(countData = round(count_matrix),
-                              colData = DESeq_matrix,
-                              design = ~ condition)
-
-#Get rid of the genes that have very low count
-dds <- dds[ rowSums(counts(dds)) > 10, ]
-```
-
-```{r Perform DESeq2 analysis of the normalised counts}
-# Run DESeq2 analysis
-dds <- DESeq(dds)
-
-# Extract differential expression results
-res <- results(dds)
-res <- data.frame(res)
-```
-
-```{r Check the DE genes}
-#Get the differentially expressed genes
-de_genes <- subset(res, padj < 0.1)
-de_genes <- subset(de_genes, log2FoldChange > 3 | log2FoldChange < -3)
-de_genes <- subset(de_genes, !is.na(padj))
-```
 
 #Visual representation
-
-```{r plotMA}
-# 4. Visualize results
-#plotMA(res)
-```
 
 ```{r VST and PCA plot}
 #VST for the PCA plot
@@ -207,25 +159,68 @@ EnhancedVolcano(volcano_plot_data,
 #dev.off()
 ```
 
-```{r GO enrichment}
+```{r GO enrichment CC}
 #Perform the GO enrichment with a Biological Pathway pov
-GO_results <- enrichGO(gene = rownames(de_genes), OrgDb = "org.Hs.eg.db", keyType = "SYMBOL", ont = "BP")
+GO_results_CC <- enrichGO(gene = rownames(de_genes), OrgDb = "org.Hs.eg.db", keyType = "SYMBOL", ont = "CC")
 
 #Filter depending on the gene count per pathway is not <5
-GO_results_filtered <- filter(GO_results, Count >5)
+GO_results_filtered_CC <- filter(GO_results_CC, Count >5)
 
 
 #Transform the output into a data frame
-GO_results_data_frame <- as.data.frame(GO_results_filtered)
+GO_results_data_frame_CC <- as.data.frame(GO_results_filtered_CC)
 
 #Plot pp vs. nn timepoint 24
-GO_results <- plot(barplot(GO_results_filtered, 
+GO_results_CC <- plot(barplot(GO_results_filtered_CC, 
                                            showCategory = 10,
-                                           title = "GO of the DE genes",
+                                           title = "GO of the DE genes Cellular Component",
                                            font.size = 10))
 
 #png("GO_results.png", res =250, width = 1000, height = 1300)
-print(GO_results)
+print(GO_results_CC)
+#dev.off()
+```
+
+```{r GO enrichment BP}
+#Perform the GO enrichment with a Biological Pathway pov
+GO_results_BP <- enrichGO(gene = rownames(de_genes), OrgDb = "org.Hs.eg.db", keyType = "SYMBOL", ont = "BP")
+
+#Filter depending on the gene count per pathway is not <5
+GO_results_filtered_BP <- filter(GO_results_BP, Count >5)
+
+
+#Transform the output into a data frame
+GO_results_data_frame_BP <- as.data.frame(GO_results_filtered_BP)
+
+#Plot pp vs. nn timepoint 24
+GO_results_BP <- plot(barplot(GO_results_filtered_BP, 
+                                           showCategory = 10,
+                                           title = "GO of the DE genes Biological Process",
+                                           font.size = 10))
+
+#png("GO_results.png", res =250, width = 1000, height = 1300)
+print(GO_results_BP)
+#dev.off()
+```
+
+```{r GO enrichment MF}
+#Perform the GO enrichment with a Biological Pathway pov
+GO_results_MF <- enrichGO(gene = rownames(de_genes), OrgDb = "org.Hs.eg.db", keyType = "SYMBOL", ont = "MF")
+
+#Filter depending on the gene count per pathway is not <5
+GO_results_filtered_MF <- filter(GO_results_MF, Count >5)
+
+
+#Transform the output into a data frame
+GO_results_data_frame_MF <- as.data.frame(GO_results_filtered_MF)
+
+#Plot pp vs. nn timepoint 24
+GO_results_MF <- plot(barplot(GO_results_filtered_MF, 
+                              showCategory = 10,
+                              title = "GO of the DE genes Mollecular Function",                                        font.size = 10))
+
+#png("GO_results.png", res =250, width = 1000, height = 1300)
+print(GO_results_MF)
 #dev.off()
 ```
 
