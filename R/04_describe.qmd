@@ -9,50 +9,50 @@ editor: visual
 # Load packages
 
 ```{r}
-library("tidyverse")
-library("quarto")
+library(tidyverse)
+library(DESeq2)
 ```
 
-# Creating directories
+#Start the DESeq analysis
 
-```{r}
-dir.create("data/_raw", recursive = TRUE)
-dir.create("results")
-dir.create("doc")
-dir.create("R")
+```{r Create the DESeq input (DESeq matrix)}
+# Set the sample names
+sample_names <- colnames(raw_data)
+
+# Set the sample conditions
+sample_condition <- strsplit(sample_names, "_")
+sample_condition <- sapply(sample_condition, function(x) x[1])
+
+# Create a data frame with sample information
+DESeq_matrix <- data.frame(sampleName = sample_names, 
+                           fileName = t(raw_data),
+                           condition = sample_condition)
+
+#Set the conditions so we can perform DESeq2 afterwards
+# Convert raw_data to a matrix
+count_matrix <- as.matrix(raw_data)
+
+# Create a DESeqDataSet object. The round(count_matrix) help to have non-negative integers.
+dds <- DESeqDataSetFromMatrix(countData = round(count_matrix),
+                              colData = DESeq_matrix,
+                              design = ~ condition)
+
+#Get rid of the genes that have very low count
+dds <- dds[ rowSums(counts(dds)) > 10, ]
 ```
 
-```{r}
-#| warning: false
-#| message: false
-# Run 01_load file and save it as .html in the results folder
-#quarto::quarto_render("01_load.qmd")
-#file.rename("01_load.html", "../results/01_load.html")
+```{r Perform DESeq2 analysis of the normalised counts}
+# Run DESeq2 analysis
+dds <- DESeq(dds)
 
-# Run 02_clean file and save it as .html in the results folder
-#quarto::quarto_render("02_clean.qmd")
-#file.rename("02_clean.html", "../results/02_clean.html")
+# Extract differential expression results
+res <- results(dds)
+res <- data.frame(res)
+```
 
-# Run 03_describe file and save it as .html in the results folder
-#quarto::quarto_render("03_describe.qmd")
-#file.rename("03_describe.html", "../results/03_describe.html")
-
-# Run 04_augment file and save it as .html in the results folder
-#quarto::quarto_render("04_augment.qmd")
-#file.rename("04_augment.html", "../results/04_augment.html")
-
-# Run 05_analysis_1 file and save it as .html in the results folder
-#quarto::quarto_render("05_analysis_1.qmd")
-#file.rename("05_analysis_1.html", "../results/05_analysis_1.html")
-
-# Run 06_analysis_2 file and save it as .html in the results folder
-#quarto::quarto_render("06_analysis_2.qmd")
-#file.rename("06_analysis_2.html", "../results/06_analysis_2.html")
-
-# Run 07_analysis_3 file and save it as .html in the results folder
-#quarto::quarto_render("07_analysis_3.qmd")
-#file.rename("07_analysis_3.html", "../results/07_analysis_3.html")
-
-# Run Presentation file and save it as .html in the results folder
-#quarto::quarto_render("../doc/presentation.qmd")
+```{r Check the DE genes}
+#Get the differentially expressed genes
+de_genes <- subset(res, padj < 0.1)
+de_genes <- subset(de_genes, log2FoldChange > 3 | log2FoldChange < -3)
+de_genes <- subset(de_genes, !is.na(padj))
 ```

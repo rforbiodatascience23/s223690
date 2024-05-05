@@ -1,5 +1,5 @@
 ---
-title: "05_analysis"
+title: "05_analysis.1"
 format:
   html:
     embed-resources: true
@@ -9,50 +9,72 @@ editor: visual
 # Load packages
 
 ```{r}
-library("tidyverse")
-library("quarto")
+library(clusterProfiler)
+library(AnnotationDbi)
+library(org.Hs.eg.db)
 ```
 
-# Creating directories
+```{r GO enrichment CC}
+#Perform the GO enrichment with a Biological Pathway pov
+GO_results_CC <- enrichGO(gene = rownames(de_genes), OrgDb = "org.Hs.eg.db", keyType = "SYMBOL", ont = "CC")
 
-```{r}
-dir.create("data/_raw", recursive = TRUE)
-dir.create("results")
-dir.create("doc")
-dir.create("R")
+#Filter depending on the gene count per pathway is not <5
+GO_results_filtered_CC <- filter(GO_results_CC, Count >5)
+
+
+#Transform the output into a data frame
+GO_results_data_frame_CC <- as.data.frame(GO_results_filtered_CC)
+
+#Plot pp vs. nn timepoint 24
+GO_results_CC <- plot(barplot(GO_results_filtered_CC, 
+                                           showCategory = 10,
+                                           title = "GO of the DE genes Cellular Component",
+                                           font.size = 10))
+
+#png("GO_results.png", res =250, width = 1000, height = 1300)
+print(GO_results_CC)
+#dev.off()
 ```
 
-```{r}
-#| warning: false
-#| message: false
-# Run 01_load file and save it as .html in the results folder
-#quarto::quarto_render("01_load.qmd")
-#file.rename("01_load.html", "../results/01_load.html")
+```{r GO enrichment BP}
+#Perform the GO enrichment with a Biological Pathway pov
+GO_results_BP <- enrichGO(gene = rownames(de_genes), OrgDb = "org.Hs.eg.db", keyType = "SYMBOL", ont = "BP")
 
-# Run 02_clean file and save it as .html in the results folder
-#quarto::quarto_render("02_clean.qmd")
-#file.rename("02_clean.html", "../results/02_clean.html")
+#Filter depending on the gene count per pathway is not <5
+GO_results_filtered_BP <- filter(GO_results_BP, Count >5)
 
-# Run 03_describe file and save it as .html in the results folder
-#quarto::quarto_render("03_describe.qmd")
-#file.rename("03_describe.html", "../results/03_describe.html")
 
-# Run 04_augment file and save it as .html in the results folder
-#quarto::quarto_render("04_augment.qmd")
-#file.rename("04_augment.html", "../results/04_augment.html")
+#Transform the output into a data frame
+GO_results_data_frame_BP <- as.data.frame(GO_results_filtered_BP)
 
-# Run 05_analysis_1 file and save it as .html in the results folder
-#quarto::quarto_render("05_analysis_1.qmd")
-#file.rename("05_analysis_1.html", "../results/05_analysis_1.html")
+#Plot pp vs. nn timepoint 24
+GO_results_BP <- plot(barplot(GO_results_filtered_BP, 
+                                           showCategory = 10,
+                                           title = "GO of the DE genes Biological Process",
+                                           font.size = 10))
 
-# Run 06_analysis_2 file and save it as .html in the results folder
-#quarto::quarto_render("06_analysis_2.qmd")
-#file.rename("06_analysis_2.html", "../results/06_analysis_2.html")
+#png("GO_results.png", res =250, width = 1000, height = 1300)
+print(GO_results_BP)
+#dev.off()
+```
 
-# Run 07_analysis_3 file and save it as .html in the results folder
-#quarto::quarto_render("07_analysis_3.qmd")
-#file.rename("07_analysis_3.html", "../results/07_analysis_3.html")
+```{r GO enrichment MF}
+#Perform the GO enrichment with a Biological Pathway pov
+GO_results_MF <- enrichGO(gene = rownames(de_genes), OrgDb = "org.Hs.eg.db", keyType = "SYMBOL", ont = "MF")
 
-# Run Presentation file and save it as .html in the results folder
-#quarto::quarto_render("../doc/presentation.qmd")
+#Filter depending on the gene count per pathway is not <5
+GO_results_filtered_MF <- filter(GO_results_MF, Count >5)
+
+
+#Transform the output into a data frame
+GO_results_data_frame_MF <- as.data.frame(GO_results_filtered_MF)
+
+#Plot pp vs. nn timepoint 24
+GO_results_MF <- plot(barplot(GO_results_filtered_MF, 
+                              showCategory = 10,
+                              title = "GO of the DE genes Mollecular Function",                                        font.size = 10))
+
+#png("GO_results.png", res =250, width = 1000, height = 1300)
+print(GO_results_MF)
+#dev.off()
 ```

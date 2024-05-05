@@ -16,11 +16,6 @@ library(DESeq2)
 library(RColorBrewer)
 library(pheatmap)
 library(viridis)
-library(EnhancedVolcano)
-
-library(clusterProfiler)
-library(AnnotationDbi)
-library(org.Hs.eg.db)
 ```
 
 # Read the data file
@@ -124,103 +119,6 @@ pheatmap(t(z_scores),
 
 )
 
-#dev.off()
-```
-
-```{r Volcano plot of DE genes}
-volcano_plot_data <- as.data.frame(res)
-
-#See what are the maximum and minimum values for the plot
-max_log2_volcano_plot <- max(volcano_plot_data$log2FoldChange)
-min_log2_volcano_plot <- min(volcano_plot_data$log2FoldChange)
-
-max_pvalue_volcano_plot <- max(-log10(volcano_plot_data$pvalue))
-min_pvalue_volcano_plot <- min(-log10(volcano_plot_data$pvalue))
-
-
-#Create the volcano plot (log2Fold change = 3, pvalue < 0.1)
-
-#jpeg("volcano_plot.jpeg", res = 100)
-EnhancedVolcano(volcano_plot_data,
-                lab = row.names(volcano_plot_data),
-                labSize = 4,
-                x = "log2FoldChange",
-                xlim = c(min_log2_volcano_plot, max_log2_volcano_plot),
-                y = "padj",
-                ylim = c(min_pvalue_volcano_plot, max_pvalue_volcano_plot),
-                pCutoff = 0.1,
-                FCcutoff = 3,
-                axisLabSize = 12,
-                caption = NULL,
-                subtitle = NULL,
-                legendPosition = "none",
-                title = "Volcano plot"
-                )
-#dev.off()
-```
-
-```{r GO enrichment CC}
-#Perform the GO enrichment with a Biological Pathway pov
-GO_results_CC <- enrichGO(gene = rownames(de_genes), OrgDb = "org.Hs.eg.db", keyType = "SYMBOL", ont = "CC")
-
-#Filter depending on the gene count per pathway is not <5
-GO_results_filtered_CC <- filter(GO_results_CC, Count >5)
-
-
-#Transform the output into a data frame
-GO_results_data_frame_CC <- as.data.frame(GO_results_filtered_CC)
-
-#Plot pp vs. nn timepoint 24
-GO_results_CC <- plot(barplot(GO_results_filtered_CC, 
-                                           showCategory = 10,
-                                           title = "GO of the DE genes Cellular Component",
-                                           font.size = 10))
-
-#png("GO_results.png", res =250, width = 1000, height = 1300)
-print(GO_results_CC)
-#dev.off()
-```
-
-```{r GO enrichment BP}
-#Perform the GO enrichment with a Biological Pathway pov
-GO_results_BP <- enrichGO(gene = rownames(de_genes), OrgDb = "org.Hs.eg.db", keyType = "SYMBOL", ont = "BP")
-
-#Filter depending on the gene count per pathway is not <5
-GO_results_filtered_BP <- filter(GO_results_BP, Count >5)
-
-
-#Transform the output into a data frame
-GO_results_data_frame_BP <- as.data.frame(GO_results_filtered_BP)
-
-#Plot pp vs. nn timepoint 24
-GO_results_BP <- plot(barplot(GO_results_filtered_BP, 
-                                           showCategory = 10,
-                                           title = "GO of the DE genes Biological Process",
-                                           font.size = 10))
-
-#png("GO_results.png", res =250, width = 1000, height = 1300)
-print(GO_results_BP)
-#dev.off()
-```
-
-```{r GO enrichment MF}
-#Perform the GO enrichment with a Biological Pathway pov
-GO_results_MF <- enrichGO(gene = rownames(de_genes), OrgDb = "org.Hs.eg.db", keyType = "SYMBOL", ont = "MF")
-
-#Filter depending on the gene count per pathway is not <5
-GO_results_filtered_MF <- filter(GO_results_MF, Count >5)
-
-
-#Transform the output into a data frame
-GO_results_data_frame_MF <- as.data.frame(GO_results_filtered_MF)
-
-#Plot pp vs. nn timepoint 24
-GO_results_MF <- plot(barplot(GO_results_filtered_MF, 
-                              showCategory = 10,
-                              title = "GO of the DE genes Mollecular Function",                                        font.size = 10))
-
-#png("GO_results.png", res =250, width = 1000, height = 1300)
-print(GO_results_MF)
 #dev.off()
 ```
 
