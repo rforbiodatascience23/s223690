@@ -13,33 +13,35 @@ library(tidyverse)
 library(DESeq2)
 ```
 
-#Start the DESeq analysis
+#Visual representation
 
-```{r Create the DESeq input (DESeq matrix)}
-# Set the sample names
-sample_names <- colnames(raw_data)
+```{r VST and PCA plot}
+#VST for the PCA plot
+dds <- estimateSizeFactors(dds)
 
-# Set the sample conditions
-sample_condition <- strsplit(sample_names, "_")
-sample_condition <- sapply(sample_condition, function(x) x[1])
+vst <- vst(dds, blind = FALSE)
 
-# Create a data frame with sample information
-DESeq_matrix <- data.frame(sampleName = sample_names, 
-                           fileName = t(raw_data),
-                           condition = sample_condition)
+sampleDists <- dist(t(assay(vst)))
 
-#Set the conditions so we can perform DESeq2 afterwards
-# Convert raw_data to a matrix
-count_matrix <- as.matrix(raw_data)
+#PHeatMap with the distances
+sampleDistMatrix <- as.matrix(sampleDists)
 
-# Create a DESeqDataSet object. The round(count_matrix) help to have non-negative integers.
-dds <- DESeqDataSetFromMatrix(countData = round(count_matrix),
-                              colData = DESeq_matrix,
-                              design = ~ condition)
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
 
-#Get rid of the genes that have very low count
-dds <- dds[ rowSums(counts(dds)) > 10, ]
+#jpeg("distance_heatmap.jpeg")
+
+pheatmap_distances <- pheatmap(sampleDistMatrix, 
+                               clustering_distance_rows = sampleDists, 
+                               clustering_distance_cols = sampleDists, 
+                               col = colors,
+                               main = "Heatmap of sample-to-sample distances using the variance stabilizing transformed values")
+
+#dev.off()
+
+plotPCA(vst)
 ```
+
+#Start the DESeq analysis
 
 ```{r Perform DESeq2 analysis of the normalised counts}
 # Run DESeq2 analysis
@@ -56,3 +58,5 @@ de_genes <- subset(res, padj < 0.1)
 de_genes <- subset(de_genes, log2FoldChange > 3 | log2FoldChange < -3)
 de_genes <- subset(de_genes, !is.na(padj))
 ```
+
+

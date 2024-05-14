@@ -14,67 +14,42 @@ library(AnnotationDbi)
 library(org.Hs.eg.db)
 ```
 
-```{r GO enrichment CC}
-#Perform the GO enrichment with a Biological Pathway pov
-GO_results_CC <- enrichGO(gene = rownames(de_genes), OrgDb = "org.Hs.eg.db", keyType = "SYMBOL", ont = "CC")
+#Visual representation
+```{r Heatmap}
+#Just consider the genes that were DE ans VST
+de_genes_names <- unique(c(rownames(de_genes)))
 
-#Filter depending on the gene count per pathway is not <5
-GO_results_filtered_CC <- filter(GO_results_CC, Count >5)
+de_genes_vst <- vst[rownames(vst) %in% de_genes_names, ]
 
-
-#Transform the output into a data frame
-GO_results_data_frame_CC <- as.data.frame(GO_results_filtered_CC)
-
-#Plot pp vs. nn timepoint 24
-GO_results_CC <- plot(barplot(GO_results_filtered_CC, 
-                                           showCategory = 10,
-                                           title = "GO of the DE genes Cellular Component",
-                                           font.size = 10))
-
-#png("GO_results.png", res =250, width = 1000, height = 1300)
-print(GO_results_CC)
-#dev.off()
-```
-
-```{r GO enrichment BP}
-#Perform the GO enrichment with a Biological Pathway pov
-GO_results_BP <- enrichGO(gene = rownames(de_genes), OrgDb = "org.Hs.eg.db", keyType = "SYMBOL", ont = "BP")
-
-#Filter depending on the gene count per pathway is not <5
-GO_results_filtered_BP <- filter(GO_results_BP, Count >5)
+de_genes_vst_matrix <- assay(de_genes_vst)
 
 
-#Transform the output into a data frame
-GO_results_data_frame_BP <- as.data.frame(GO_results_filtered_BP)
+#Calculate the z-score
+z_scores <- scale(de_genes_vst_matrix)
 
-#Plot pp vs. nn timepoint 24
-GO_results_BP <- plot(barplot(GO_results_filtered_BP, 
-                                           showCategory = 10,
-                                           title = "GO of the DE genes Biological Process",
-                                           font.size = 10))
+# Define breaks and labels for the quantile scale (putting the function, it doesn't really matter the name of the variable)
+quantile_breaks <- function(z_scores, n = 10) {
+  breaks <- quantile(z_scores, probs = seq(0, 1, length.out = n), na.rm = TRUE)
+  breaks[!duplicated(breaks)]
+}
 
-#png("GO_results.png", res =250, width = 1000, height = 1300)
-print(GO_results_BP)
-#dev.off()
-```
+breaks <- quantile_breaks(z_scores, n = 11)
 
-```{r GO enrichment MF}
-#Perform the GO enrichment with a Biological Pathway pov
-GO_results_MF <- enrichGO(gene = rownames(de_genes), OrgDb = "org.Hs.eg.db", keyType = "SYMBOL", ont = "MF")
+# Create a heatmap using pheatmap with a specified color palette
+#jpeg("pheatmap_of_expression.jpeg")
 
-#Filter depending on the gene count per pathway is not <5
-GO_results_filtered_MF <- filter(GO_results_MF, Count >5)
+pheatmap(t(z_scores),
+         #annotation_row = annotation_row_4,
+         cluster_rows = TRUE,
+         cluster_cols = TRUE,
+         main = "Heatmap z-score od DE genes",
+         breaks = breaks,
+         color = viridis(10),
+         fontsize_row = 8,
+         show_colnames = FALSE,
+         border_color = "NA",
 
+)
 
-#Transform the output into a data frame
-GO_results_data_frame_MF <- as.data.frame(GO_results_filtered_MF)
-
-#Plot pp vs. nn timepoint 24
-GO_results_MF <- plot(barplot(GO_results_filtered_MF, 
-                              showCategory = 10,
-                              title = "GO of the DE genes Mollecular Function",                                        font.size = 10))
-
-#png("GO_results.png", res =250, width = 1000, height = 1300)
-print(GO_results_MF)
 #dev.off()
 ```

@@ -40,19 +40,3 @@ dds <- DESeqDataSetFromMatrix(countData = round(count_matrix),
 #Get rid of the genes that have very low count
 dds <- dds[ rowSums(counts(dds)) > 10, ]
 ```
-
-```{r Perform DESeq2 analysis of the normalised counts}
-# Run DESeq2 analysis
-dds <- DESeq(dds)
-
-# Extract differential expression results
-res <- results(dds)
-res <- data.frame(res)
-```
-
-```{r Check the DE genes}
-#Get the differentially expressed genes
-de_genes <- subset(res, padj < 0.1)
-de_genes <- subset(de_genes, log2FoldChange > 3 | log2FoldChange < -3)
-de_genes <- subset(de_genes, !is.na(padj))
-```
