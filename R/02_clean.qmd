@@ -28,7 +28,7 @@ raw_data <- read_delim("../data/_raw/citotoxicity_genes_breast_cancer.tsv", deli
 #Rename the columns
 
 ```{r Rename the columns}
-# Sample list
+# Sample list (The names were copied directly from the webpage)
 list <- c("Genes", "GSM5574685	tumor rep1", "GSM5574686 tumor rep2", "GSM5574687 tumor rep3", "GSM5574688 tumor rep4", "GSM5574689 tumor rep5", "GSM5574690 tumor rep6", "GSM5574691 tumor rep7", "GSM5574692 tumor rep8", "GSM5574693 tumor rep9", "GSM5574694 tumor rep10", "GSM5574695 tumor rep11", "GSM5574696 tumor rep12", "GSM5574697 tumor rep13", "GSM5574698 tumor rep14", "GSM5574699 tumor rep15",  "GSM5574700 tumor rep16", "GSM5574701 tumor rep17", "GSM5574702 tumor rep18", "GSM5574703 tumor rep19", "GSM5574704 tumor rep20", "GSM5574705 tumor rep21", "GSM5574706 tumor rep22", "GSM5574707 tumor rep23", "GSM5574708 tumor rep24", "GSM5574709 tumor rep25", "GSM5574710 tumor rep26", "GSM5574711 tumor rep27", "GSM5574712 tumor rep28", "GSM5574713 tumor rep29", "GSM5574714 tumor rep30", "GSM5574715 normal rep1", "GSM5574716 normal rep2", "GSM5574717 normal rep3", "GSM5574718 normal rep4", "GSM5574719 normal rep5", "GSM5574720 normal rep6", "GSM5574721 normal rep7", "GSM5574722 normal rep8", "GSM5574723 normal rep9", "GSM5574724 normal rep10", "GSM5574725 normal rep11", "GSM5574726 normal rep12",  "GSM5574727 normal rep13", "GSM5574728 normal rep14", "GSM5574729 normal rep15", "GSM5574730 normal rep16", "GSM5574731 normal rep17", "GSM5574732 normal rep18", "GSM5574733 normal rep19", "GSM5574734 normal rep20", "GSM5574735 normal rep21", "GSM5574736 normal rep22", "GSM5574737 normal rep23", "GSM5574738 normal rep24", "GSM5574739 normal rep25", "GSM5574740 normal rep26", "GSM5574741 normal rep27", "GSM5574742 normal rep28", "GSM5574743 normal rep29", "GSM5574744 normal rep30")
 
 # Remove words that start with "GSM" so we have the actual names
@@ -41,17 +41,32 @@ new_column_names <- gsub(" ", "_", new_column_names)
 print(new_column_names)
 
 #Change the name of the columns with this one
-colnames(raw_data) <- new_column_names
+clean_data <- as.data.frame(raw_data)
+colnames(clean_data) <- new_column_names
 
 # Set the first column (gene names) as rownames
-raw_data <- as.data.frame(raw_data)
-rownames(raw_data) <- raw_data[, 1]
-raw_data <- raw_data[, -1]
+rownames(clean_data) <- clean_data[, 1]
+clean_data <- clean_data[, -1]
 ```
 
 ```{r Check if there are na values in the data set}
 #Check if there are NaN or na values in the data set
-nan_counts <- unique(colSums(is.na(raw_data)))
+nan_counts <- unique(colSums(is.na(clean_data)))
 ```
 
+```{r Save the clean data}
+# Define the path for the output .tsv file
+output_file_path <- "../data/data_clean.tsv"
+
+# Save the subset data frame to a .tsv file
+write.table(clean_data, file = output_file_path, sep = "\t", quote = FALSE, row.names = FALSE)
+
+# Verify that the file has been saved
+if (file.exists(output_file_path)) {
+  cat("Clean data has ben saved to", output_file_path, "\n")
+} else {
+  cat("Failed to save Clean data has ben saves to", output_file_path, "\n")
+}
+
+```
 
