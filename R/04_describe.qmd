@@ -11,7 +11,30 @@ editor: visual
 ```{r}
 library(tidyverse)
 library(DESeq2)
+library(umap)
+library(ggplot2)
+
 ```
+
+```{r UMAP}
+# Assuming you have your RNA-seq data loaded into a matrix called 'expression_data'
+# Rows are genes and columns are samples
+
+# Perform UMAP dimensionality reduction
+umap_result <- umap(raw_data)
+
+new_names_umap <- c("UMAP1", "UMAP2")
+
+colnames(umap_result)[1] <- new_names_umap[1]
+
+
+# Visualize the UMAP embedding
+ggplot(as.data.frame(umap_result$layout), aes(x = ([,1]), y = ([,2])) +
+  geom_point() +
+  theme_minimal()
+
+```
+
 
 #Visual representation
 
