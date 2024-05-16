@@ -13,12 +13,12 @@ library(tidyverse)
 ```
 
 #Load the data
-```{r Load the data from 02_clean.qmd}
-res <- read_delim("../data/DESeq2_results.tsv", 
-                         delim = "\t", 
-                         show_col_types = FALSE)
-```
 
+```{r Load the data from 02_clean.qmd}
+res <- read.delim("../data/DESeq2_results.tsv",
+                         row.names = 1, 
+                         stringsAsFactors = FALSE)
+```
 
 ```{r Check the DE genes}
 #Get the differentially expressed genes
@@ -28,12 +28,13 @@ de_genes <- subset(de_genes, !is.na(padj))
 ```
 
 #Save data
+
 ```{r Save the clean data}
 # Define the path for the output .tsv file
 output_file_path <- "../data/de_genes.tsv"
 
 # Save the subset data frame to a .tsv file
-write.table(de_genes, file = output_file_path, sep = "\t", quote = FALSE, row.names = FALSE)
+write.table(de_genes, file = output_file_path, sep = "\t", quote = FALSE, row.names = TRUE)
 
 # Verify that the file has been saved
 if (file.exists(output_file_path)) {

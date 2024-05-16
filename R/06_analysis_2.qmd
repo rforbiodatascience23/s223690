@@ -14,6 +14,13 @@ library(quarto)
 library(EnhancedVolcano)
 ```
 
+#Load the data
+```{r Load the data from 02_clean.qmd}
+res <- read.delim("../data/DESeq2_results.tsv",
+                         row.names = 1, 
+                         stringsAsFactors = FALSE)
+```
+
 ```{r Volcano plot of DE genes}
 volcano_plot_data <- as.data.frame(res)
 

@@ -19,9 +19,10 @@ library(ggplot2)
 #Load the data
 
 ```{r Load the data from 02_clean.qmd}
-clean_data <- read_delim("../data/clean_data.tsv", 
-                         delim = "\t", 
-                         show_col_types = FALSE)
+clean_data <- read.delim("../data/clean_data.tsv", 
+                         row.names = 1, 
+                         stringsAsFactors = FALSE)
+
 ```
 
 #Start the DESeq analysis
@@ -116,13 +117,30 @@ res <- data.frame(res)
 output_file_path <- "../data/DESeq2_results.tsv"
 
 # Save the subset data frame to a .tsv file
-write.table(res, file = output_file_path, sep = "\t", quote = FALSE, row.names = FALSE)
+write.table(res, file = output_file_path, sep = "\t", quote = FALSE, row.names = TRUE)
 
 # Verify that the file has been saved
 if (file.exists(output_file_path)) {
-  cat("Clean data has ben saved to", output_file_path, "\n")
+  cat("Results from DESeq2 has been saved to", output_file_path, "\n")
 } else {
-  cat("Failed to save Clean data has ben saved to", output_file_path, "\n")
+  cat("Failed to save Results from DESeq2 to", output_file_path, "\n")
 }
 
 ```
+
+```{r}
+# Define the path for the output file
+output_file_path <- "../data/vst.rds"
+
+# Save the vst object
+saveRDS(vst, file = output_file_path)
+
+# Verify that the file has been saved
+if (file.exists(output_file_path)) {
+  cat("vst object has been saved to", output_file_path, "\n")
+} else {
+  cat("Failed to save vst object to", output_file_path, "\n")
+}
+
+```
+

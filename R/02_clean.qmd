@@ -78,7 +78,7 @@ nan_counts <- unique(colSums(is.na(clean_data)))
 output_file_path <- "../data/clean_data.tsv"
 
 # Save the subset data frame to a .tsv file
-write.table(clean_data, file = output_file_path, sep = "\t", quote = FALSE, row.names = FALSE)
+write.table(clean_data, file = output_file_path, sep = "\t", quote = FALSE, row.names = T)
 
 # Verify that the file has been saved
 if (file.exists(output_file_path)) {
@@ -88,4 +88,3 @@ if (file.exists(output_file_path)) {
 }
 
 ```
-

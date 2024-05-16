@@ -16,9 +16,11 @@ library(org.Hs.eg.db)
 
 #Load the data
 ```{r Load the data from 02_clean.qmd}
-de_genes <- read_delim("../data/de_genes.tsv", 
-                         delim = "\t", 
-                         show_col_types = FALSE)
+de_genes <- read.delim("../data/de_genes.tsv", 
+                         row.names = 1, 
+                         stringsAsFactors = FALSE)
+
+vst <- readRDS("../data/vst.rds")
 ```
 
 #Visual representation
