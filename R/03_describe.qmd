@@ -17,6 +17,7 @@ library(ggplot2)
 ```
 
 #Load the data
+
 ```{r Load the data from 02_clean.qmd}
 clean_data <- read_delim("../data/clean_data.tsv", 
                          delim = "\t", 
@@ -109,6 +110,7 @@ res <- data.frame(res)
 ```
 
 #Save data
+
 ```{r Save the clean data}
 # Define the path for the output .tsv file
 output_file_path <- "../data/DESeq2_results.tsv"
