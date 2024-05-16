@@ -16,25 +16,40 @@ library(ggplot2)
 
 ```
 
-```{r UMAP}
-# Assuming you have your RNA-seq data loaded into a matrix called 'expression_data'
-# Rows are genes and columns are samples
-
-# Perform UMAP dimensionality reduction
-umap_result <- umap(raw_data)
-
-new_names_umap <- c("UMAP1", "UMAP2")
-
-colnames(umap_result)[1] <- new_names_umap[1]
-
-
-# Visualize the UMAP embedding
-ggplot(as.data.frame(umap_result$layout), aes(x = ([,1]), y = ([,2])) +
-  geom_point() +
-  theme_minimal()
-
+#Load the data
+```{r Load the data from 02_clean.qmd}
+clean_data <- read_delim("../data/clean_data.tsv", 
+                         delim = "\t", 
+                         show_col_types = FALSE)
 ```
 
+#Start the DESeq analysis
+
+```{r Create the DESeq input (DESeq matrix)}
+# Set the sample names
+sample_names <- colnames(clean_data)
+
+# Set the sample conditions
+sample_condition <- strsplit(sample_names, "_")
+sample_condition <- sapply(sample_condition, function(x) x[1])
+
+# Create a data frame with sample information
+DESeq_matrix <- data.frame(sampleName = sample_names, 
+                           fileName = t(clean_data),
+                           condition = sample_condition)
+
+#Set the conditions so we can perform DESeq2 afterwards
+# Convert raw_data to a matrix
+count_matrix <- as.matrix(clean_data)
+
+# Create a DESeqDataSet object. The round(count_matrix) help to have non-negative integers.
+dds <- DESeqDataSetFromMatrix(countData = round(count_matrix),
+                              colData = DESeq_matrix,
+                              design = ~ condition)
+
+#Get rid of the genes that have very low count
+dds <- dds[ rowSums(counts(dds)) > 10, ]
+```
 
 #Visual representation
 
@@ -62,6 +77,24 @@ pheatmap_distances <- pheatmap(sampleDistMatrix,
 #dev.off()
 
 plotPCA(vst)
+
+#Add another way of performing the PCA using ggplot2
+# Assuming you have already calculated the vst values and stored them in 'vst'
+
+# Extract principal components
+pca <- prcomp(t(assay(vst)))
+
+# Create a data frame with PC scores
+pca_data <- as.data.frame(pca$x[,1:2])  # Considering the first two PCs
+pca_data$condition <- as.factor(DESeq_matrix$condition)  # Ensure 'condition' is a factor
+
+# Plot using ggplot2
+ggplot(pca_data, aes(x = PC1, y = PC2)) +
+  geom_point(aes(colour = condition),
+             shape = 19,
+             size = 2.5) +
+  labs(x = "PC1", y = "PC2", title = "PCA Plot using ggplot2")
+
 ```
 
 #Start the DESeq analysis
@@ -75,11 +108,19 @@ res <- results(dds)
 res <- data.frame(res)
 ```
 
-```{r Check the DE genes}
-#Get the differentially expressed genes
-de_genes <- subset(res, padj < 0.1)
-de_genes <- subset(de_genes, log2FoldChange > 3 | log2FoldChange < -3)
-de_genes <- subset(de_genes, !is.na(padj))
+#Save data
+```{r Save the clean data}
+# Define the path for the output .tsv file
+output_file_path <- "../data/DESeq2_results.tsv"
+
+# Save the subset data frame to a .tsv file
+write.table(res, file = output_file_path, sep = "\t", quote = FALSE, row.names = FALSE)
+
+# Verify that the file has been saved
+if (file.exists(output_file_path)) {
+  cat("Clean data has ben saved to", output_file_path, "\n")
+} else {
+  cat("Failed to save Clean data has ben saved to", output_file_path, "\n")
+}
+
 ```
-
-
