@@ -14,7 +14,7 @@ library(quarto)
 library(EnhancedVolcano)
 ```
 
-#Load the data
+# Load the data
 
 ```{r Load the data from 02_clean.qmd}
 setwd("C:/Users/marin/OneDrive/Documentos/GitHub/s223690/R")
@@ -22,6 +22,8 @@ res <- read.delim("../data/DESeq2_results.tsv",
                          row.names = 1, 
                          stringsAsFactors = FALSE)
 ```
+
+# Create a volcano plot
 
 ```{r Volcano plot of DE genes}
 volcano_plot_data <- as.data.frame(res)
