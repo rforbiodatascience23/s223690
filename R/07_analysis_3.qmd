@@ -14,9 +14,9 @@ library(AnnotationDbi)
 library(org.Hs.eg.db)
 ```
 
-#Load the data
+# Load the data
 
-```{r Load the data from 02_clean.qmd}
+```{r Load the data}
 setwd("C:/Users/marin/OneDrive/Documentos/GitHub/s223690/R")
 
 de_genes <- read.delim("../data/de_genes.tsv", 
@@ -24,13 +24,16 @@ de_genes <- read.delim("../data/de_genes.tsv",
                          stringsAsFactors = FALSE)
 ```
 
+# Perform the Gene Ontology Enrichment Analysis
+
+## Gene Ontology Enrichment Analysis focusing on the Celular Component
+
 ```{r GO enrichment CC}
 #Perform the GO enrichment with a Biological Pathway pov
 GO_results_CC <- enrichGO(gene = rownames(de_genes), OrgDb = "org.Hs.eg.db", keyType = "SYMBOL", ont = "CC")
 
 #Filter depending on the gene count per pathway is not <5
 GO_results_filtered_CC <- filter(GO_results_CC, Count >5)
-
 
 #Transform the output into a data frame
 GO_results_data_frame_CC <- as.data.frame(GO_results_filtered_CC)
@@ -45,6 +48,8 @@ GO_results_CC <- plot(barplot(GO_results_filtered_CC,
 
 dev.off()
 ```
+
+## Gene Ontology Enrichment Analysis focusing on the Biological Process
 
 ```{r GO enrichment BP}
 #Perform the GO enrichment with a Biological Pathway pov
@@ -67,6 +72,8 @@ GO_results_BP <- plot(barplot(GO_results_filtered_BP,
 
 dev.off()
 ```
+
+## Gene Ontology Enrichment Analysis focusing on the Molecular Function
 
 ```{r GO enrichment MF}
 #Perform the GO enrichment with a Biological Pathway pov
