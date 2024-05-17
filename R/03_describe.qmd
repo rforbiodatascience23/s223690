@@ -13,12 +13,14 @@ library(tidyverse)
 library(DESeq2)
 library(umap)
 library(ggplot2)
+library(RColorBrewer)
 
 ```
 
 #Load the data
 
 ```{r Load the data from 02_clean.qmd}
+setwd("C:/Users/marin/OneDrive/Documentos/GitHub/s223690/R")
 clean_data <- read.delim("../data/clean_data.tsv", 
                          row.names = 1, 
                          stringsAsFactors = FALSE)
@@ -68,7 +70,7 @@ sampleDistMatrix <- as.matrix(sampleDists)
 
 colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
 
-#jpeg("distance_heatmap.jpeg")
+#jpeg("../doc/photos/distance_map.jpeg", width = 600, height = 500, res = 100)
 
 pheatmap_distances <- pheatmap(sampleDistMatrix, 
                                clustering_distance_rows = sampleDists, 
@@ -78,7 +80,11 @@ pheatmap_distances <- pheatmap(sampleDistMatrix,
 
 #dev.off()
 
+jpeg("../results/PCA.png", width = 600, height = 500, res = 100)
+
 plotPCA(vst)
+
+dev.off()
 
 #Add another way of performing the PCA using ggplot2
 # Assuming you have already calculated the vst values and stored them in 'vst'
@@ -117,7 +123,11 @@ res <- data.frame(res)
 output_file_path <- "../data/DESeq2_results.tsv"
 
 # Save the subset data frame to a .tsv file
-write.table(res, file = output_file_path, sep = "\t", quote = FALSE, row.names = TRUE)
+write.table(res, 
+            file = output_file_path, 
+            sep = "\t", 
+            quote = FALSE, 
+            row.names = TRUE)
 
 # Verify that the file has been saved
 if (file.exists(output_file_path)) {
@@ -143,4 +153,3 @@ if (file.exists(output_file_path)) {
 }
 
 ```
-

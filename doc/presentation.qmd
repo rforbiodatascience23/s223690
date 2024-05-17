@@ -1,0 +1,127 @@
+---
+title: "Identification of cytotoxicity-related genes in breast cancer using RNA-seq"
+subtitle: "Marina Sangés Ametllé (s223690)"
+institute: "Technical University of Denmark (DTU)"
+format:
+  revealjs:
+    embed-resources: true 
+    slide-number: true
+    theme: sky
+    transition: slide 
+    logo: "logos/DTU_logo.png"
+    footer: "R for Bio Data Science 17-05-2024"
+---
+
+## What is RNA-seq?
+
+::: {.fragment fragment-index="1"}
+![](photos/physiopathology.png){.absolute top="150" left="-50" width="400" height="400" responsive="true"}
+:::
+
+::: {.fragment fragment-index="2"}
+![](photos/stem_cells_1.jpg){.absolute top="150" left="350" width="300" height="300" responsive="true"}
+:::
+
+::: {.fragment fragment-index="3"}
+![](photos/cell_differentiation_1.jpg){.absolute top="150" left="700" width="400" height="400"}
+:::
+
+## OUR DATA {.smaller}
+
+::: {.fragment fragment-index="1"}
+Our data consists of the reads of the RNA sequencing data that was normalized using FPKM data (Fragments Per Kilobase Million). This normalization allows us to quantify gene expression levels.
+:::
+
+::: {.fragment fragment-index="2"}
+The data is composed by 60 samples of breast cells in total: 30 of tumor cells and 30 of normal cells.
+:::
+
+::: {.fragment fragment-index="3"}
+Per each one of the samples, the expression of 20246 genes will be assessed. 
+:::
+
+::: {.fragment fragment-index="4"}
+**Final dataset size**: 20246 observations of 60 variables.
+:::
+
+## GOAL {.center}
+
+**The main goal of this analysis will be see what are the differencially expressed genes and what biological processes they affect comparing tumor and normal breast cells.**
+
+## CLEANING {.smaller}
+
+::: incremental
+-   Change variable names to a more understandable name.
+-   Check the presence of null values.
+-   Change variable names.
+-   Check for non-valid samples.
+:::
+
+## CLEANING: CHECK FOR NON-VALID SAMPLES {.smaller}
+
+We will consider all the samples, but with an eye on the samples normal_rep14, normal_rep6 and tumor_rep3 since they have expression in less genes than the rest of the samples.
+
+![](../results/barplot_gene_count.png){.absolute top="250" left="275" width="800" height="400"}
+
+## DATA EXPLORATION: PCA {.smaller}
+
+![](../results/PCA.png){.absolute top="174" left="275" width="550" height="490"}
+
+::: incremental
+There is a good separation of the two group, but some samples do not follow the pattern. The samples we expected before??
+:::
+
+## RESULTS: HEATMAP {.center}
+
+![](../results/heatmap.png){.absolute top="125" width="1100" height="500"}
+
+## RESULTS: VOLCANO PLOT
+
+![](../results/volcano_plot.png){.absolute left="100" width="900" height="600"} 
+
+
+## RESULTS: GENE ENRICHMENT
+![](../results/GO_enrichment_BP.png){.absolute left="-100" width="400" height="400"} 
+
+![](../results/GO_enrichment_CC.png){.absolute left="350" width="400" height="400"} 
+
+![](../results/GO_enrichment_MF.png){.absolute left="800" width="400" height="400"} 
+
+
+## CONCLUSIONS {.smaller}
+
+::: {.fragment fragment-index="1"}
+1)  All the samples have a similar average of genes that have expression except three of them.
+:::
+
+::: {.fragment fragment-index="2"}
+2)  Both tumor and normal cells can be separated well in a PCA plot.
+:::
+
+::: {.fragment fragment-index="3"}
+3)  There is a total of 385 differentially expressed genes. Tumor and normal breast cells have different DE (differentially expressed) genes as a group.
+:::
+
+::: {.fragment fragment-index="4"}
+4)  There are more downregulated genes in the tumor vs normal cells than upregulated genes.
+:::
+
+::: {.fragment fragment-index="5"}
+5)  Gene enrichment showed that the differentially expressed genes affect specially keratine processes, cell division and cell-cell interaction.
+:::
+
+## THANK YOU FOR YOUR ATTENTION! {.center .smaller}
+
+```{=html}
+<style>
+.center {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* This ensures full vertical height */
+}
+</style>
+```
+Marina Sangés Ametllé (s223690)

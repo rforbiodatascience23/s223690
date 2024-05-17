@@ -10,19 +10,16 @@ editor: visual
 
 ```{r Load libraries}
 library(tidyverse)
-library(DESeq2)
-
-
-library(RColorBrewer)
-library(pheatmap)
-library(viridis)
+library(ggplot2)
 ```
 
 # Read the data file
 
 ```{r Set the working directory and read the data file}
 setwd("C:/Users/marin/OneDrive/Documentos/GitHub/s223690/R")
-raw_data <- read_delim("../data/_raw/citotoxicity_genes_breast_cancer.tsv", delim = "\t", show_col_types = FALSE)
+raw_data <- read_delim("../data/_raw/citotoxicity_genes_breast_cancer.tsv", 
+                       delim = "\t", 
+                       show_col_types = FALSE)
 ```
 
 #Rename the columns
@@ -54,23 +51,32 @@ clean_data <- clean_data[, -1]
 nan_counts <- unique(colSums(is.na(clean_data)))
 ```
 
-```{r UMAP}
-# Assuming you have your RNA-seq data loaded into a matrix called 'expression_data'
-# Rows are genes and columns are samples
+```{r}
+# Count non-zero gene expressions for each sample
+non_zero_counts <- colSums(clean_data != 0)
 
-# Perform UMAP dimensionality reduction
-#umap_result <- umap(raw_data)
+# Sample names indicating normal or tumor
+sample_names <- colnames(clean_data)
 
-#new_names_umap <- c("UMAP1", "UMAP2")
+# Color vector based on sample names containing "normal" or "tumor"
+colors <- ifelse(grepl("normal", sample_names), "#80CDC1", "#FDB863")
 
-#colnames(umap_result)[1] <- new_names_umap[1]
+# Load ggplot2 library
+library(ggplot2)
 
+# Create bar plot
 
-# Visualize the UMAP embedding
-#ggplot(as.data.frame(umap_result$layout), aes(x = ([,1]), y = ([,2])) +
-  #geom_point() +
-  #theme_minimal()
+jpeg("../results/barplot_gene_count.png", width = 1100, height = 500, res = 100)
 
+ggplot(data.frame(Sample = names(non_zero_counts), Count = non_zero_counts), aes(x = Sample, y = Count, fill = colors)) +
+    geom_bar(stat = "identity") +
+    xlab("Sample") +
+    ylab("Count of genes") +
+    ggtitle("Count of genes for each sample") +
+    scale_fill_identity() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+dev.off()
 ```
 
 ```{r Save the clean data}
@@ -78,7 +84,10 @@ nan_counts <- unique(colSums(is.na(clean_data)))
 output_file_path <- "../data/clean_data.tsv"
 
 # Save the subset data frame to a .tsv file
-write.table(clean_data, file = output_file_path, sep = "\t", quote = FALSE, row.names = T)
+write.table(clean_data, file = output_file_path, 
+            sep = "\t", 
+            quote = FALSE, 
+            row.names = TRUE)
 
 # Verify that the file has been saved
 if (file.exists(output_file_path)) {

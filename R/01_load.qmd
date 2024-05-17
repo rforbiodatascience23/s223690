@@ -26,7 +26,9 @@ destination_file <- "../data/_raw/citotoxicity_genes_breast_cancer.csv"
 # Download the file
 
 ```{r}
-download.file(original_path, destination_file, method = "auto")
+download.file(original_path, 
+              destination_file, 
+              method = "auto")
 ```
 
 #Transform the file from csv to tsv
@@ -36,5 +38,6 @@ download.file(original_path, destination_file, method = "auto")
 raw_data <- read_csv(destination_file)
 raw_data <- write_delim(raw_data, 
                         file= "../data/_raw/citotoxicity_genes_breast_cancer.tsv",      
-                             delim = "\t", col_names = TRUE)
+                        delim = "\t", 
+                        col_names = TRUE)
 ```

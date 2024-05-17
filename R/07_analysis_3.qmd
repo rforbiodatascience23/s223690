@@ -15,12 +15,13 @@ library(org.Hs.eg.db)
 ```
 
 #Load the data
+
 ```{r Load the data from 02_clean.qmd}
+setwd("C:/Users/marin/OneDrive/Documentos/GitHub/s223690/R")
+
 de_genes <- read.delim("../data/de_genes.tsv", 
                          row.names = 1, 
                          stringsAsFactors = FALSE)
-
-vst <- readRDS("../data/vst.rds")
 ```
 
 ```{r GO enrichment CC}
@@ -34,15 +35,15 @@ GO_results_filtered_CC <- filter(GO_results_CC, Count >5)
 #Transform the output into a data frame
 GO_results_data_frame_CC <- as.data.frame(GO_results_filtered_CC)
 
-#Plot pp vs. nn timepoint 24
-GO_results_CC <- plot(barplot(GO_results_filtered_CC, 
-                                           showCategory = 10,
-                                           title = "GO of the DE genes Cellular Component",
-                                           font.size = 10))
+#Plot
+jpeg("../results/GO_enrichment_CC.png", width = 600, height = 600, res = 100)
 
-#png("GO_results.png", res =250, width = 1000, height = 1300)
-print(GO_results_CC)
-#dev.off()
+GO_results_CC <- plot(barplot(GO_results_filtered_CC,
+                              showCategory = 10,
+                              title = "GO of the DE genes Cellular Component",
+                              font.size = 10))
+
+dev.off()
 ```
 
 ```{r GO enrichment BP}
@@ -56,15 +57,15 @@ GO_results_filtered_BP <- filter(GO_results_BP, Count >5)
 #Transform the output into a data frame
 GO_results_data_frame_BP <- as.data.frame(GO_results_filtered_BP)
 
-#Plot pp vs. nn timepoint 24
+#Plot
+jpeg("../results/GO_enrichment_BP.png", width = 600, height = 600, res = 100)
+
 GO_results_BP <- plot(barplot(GO_results_filtered_BP, 
                                            showCategory = 10,
                                            title = "GO of the DE genes Biological Process",
                                            font.size = 10))
 
-#png("GO_results.png", res =250, width = 1000, height = 1300)
-print(GO_results_BP)
-#dev.off()
+dev.off()
 ```
 
 ```{r GO enrichment MF}
@@ -78,12 +79,11 @@ GO_results_filtered_MF <- filter(GO_results_MF, Count >5)
 #Transform the output into a data frame
 GO_results_data_frame_MF <- as.data.frame(GO_results_filtered_MF)
 
-#Plot pp vs. nn timepoint 24
+#Plot
+jpeg("../results/GO_enrichment_MF.png", width = 600, height = 600, res = 100)
+
 GO_results_MF <- plot(barplot(GO_results_filtered_MF, 
                               showCategory = 10,
-                              title = "GO of the DE genes Mollecular Function",                                        font.size = 10))
-
-#png("GO_results.png", res =250, width = 1000, height = 1300)
-print(GO_results_MF)
-#dev.off()
+                              title = "GO of the DE genes Molecular Function",                                        font.size = 10))
+dev.off()
 ```
