@@ -11,6 +11,7 @@ editor: visual
 ```{r}
 library(pheatmap)
 library(viridis)
+library(DESeq2)
 ```
 
 # Load the data
@@ -33,13 +34,11 @@ A heatmap is a good way of having a qualitative point of view from the data we a
 #Just consider the genes that were DE ans VST
 de_genes_names <- unique(c(rownames(de_genes)))
 
-de_genes_vst <- vst[rownames(vst) %in% de_genes_names, ]
+vst_matrix <- assay(vst)
+subset_matrix <- vst_matrix[rownames(vst_matrix) %in% de_genes_names, ]
 
-de_genes_vst_matrix <- assay(de_genes_vst)
-
-
-#Since we will have to create a quantile scale in the colouring of the map, it is necessary to calculate the z-score.
-z_scores <- scale(de_genes_vst_matrix)
+#Since we will have to create a quantile scale in the coloring of the map, it is necessary to calculate the z-score.
+z_scores <- scale(subset_matrix)
 
 # Define breaks and labels for the quantile scale (putting the function, it doesn't really matter the name of the variable)
 quantile_breaks <- function(z_scores, n = 10) {
@@ -50,7 +49,7 @@ quantile_breaks <- function(z_scores, n = 10) {
 breaks <- quantile_breaks(z_scores, n = 11)
 
 # Create a heatmap using pheatmap with a specified color palette
-jpeg("../results/heatmap.png", width = 1100, height = 600, res = 100)
+#jpeg("../results/heatmap.png", width = 1100, height = 600, res = 100)
 
 pheatmap(t(z_scores),
          #annotation_row = annotation_row_4,
@@ -65,7 +64,7 @@ pheatmap(t(z_scores),
 
 )
 
-dev.off()
+#dev.off()
 ```
 
 It is pretty cleat that inside the heatmap there are two main groups, so we can conclude that the two groups express different DE genes.

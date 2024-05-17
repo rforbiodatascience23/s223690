@@ -39,14 +39,14 @@ GO_results_filtered_CC <- filter(GO_results_CC, Count >5)
 GO_results_data_frame_CC <- as.data.frame(GO_results_filtered_CC)
 
 #Plot
-jpeg("../results/GO_enrichment_CC.png", width = 600, height = 600, res = 100)
+#jpeg("../results/GO_enrichment_CC.png", width = 600, height = 600, res = 100)
 
 GO_results_CC <- plot(barplot(GO_results_filtered_CC,
                               showCategory = 10,
                               title = "GO of the DE genes Cellular Component",
                               font.size = 10))
 
-dev.off()
+#dev.off()
 ```
 
 ## Gene Ontology Enrichment Analysis focusing on the Biological Process
@@ -63,14 +63,14 @@ GO_results_filtered_BP <- filter(GO_results_BP, Count >5)
 GO_results_data_frame_BP <- as.data.frame(GO_results_filtered_BP)
 
 #Plot
-jpeg("../results/GO_enrichment_BP.png", width = 600, height = 600, res = 100)
+#jpeg("../results/GO_enrichment_BP.png", width = 600, height = 600, res = 100)
 
 GO_results_BP <- plot(barplot(GO_results_filtered_BP, 
                                            showCategory = 10,
                                            title = "GO of the DE genes Biological Process",
                                            font.size = 10))
 
-dev.off()
+#dev.off()
 ```
 
 ## Gene Ontology Enrichment Analysis focusing on the Molecular Function
@@ -87,10 +87,10 @@ GO_results_filtered_MF <- filter(GO_results_MF, Count >5)
 GO_results_data_frame_MF <- as.data.frame(GO_results_filtered_MF)
 
 #Plot
-jpeg("../results/GO_enrichment_MF.png", width = 600, height = 600, res = 100)
+#jpeg("../results/GO_enrichment_MF.png", width = 600, height = 600, res = 100)
 
 GO_results_MF <- plot(barplot(GO_results_filtered_MF, 
                               showCategory = 10,
                               title = "GO of the DE genes Molecular Function",                                        font.size = 10))
-dev.off()
+#dev.off()
 ```

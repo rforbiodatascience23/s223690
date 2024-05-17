@@ -62,7 +62,7 @@ sample_names <- colnames(clean_data)
 colors <- ifelse(grepl("normal", sample_names), "#80CDC1", "#FDB863")
 
 # Create bar plot and save it
-jpeg("../results/barplot_gene_count.png", width = 1100, height = 500, res = 100)
+#jpeg("../results/barplot_gene_count.png", width = 1100, height = 500, res = 100)
 
 ggplot(data.frame(Sample = names(non_zero_counts), 
                   Count = non_zero_counts), 
@@ -74,7 +74,7 @@ ggplot(data.frame(Sample = names(non_zero_counts),
     scale_fill_identity() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-dev.off()
+#dev.off()
 ```
 
 # Save the clean data

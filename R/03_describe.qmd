@@ -83,11 +83,11 @@ pheatmap_distances <- pheatmap(sampleDistMatrix,
 #dev.off()
 
 #Perfom the PCA plot
-jpeg("../results/PCA.png", width = 600, height = 500, res = 100)
+#jpeg("../results/PCA.png", width = 600, height = 500, res = 100)
 
 plotPCA(vst)
 
-dev.off()
+#dev.off()
 
 #Add another way of performing the PCA using ggplot2
 # Extract principal components from the vst normalisation

@@ -38,7 +38,7 @@ min_pvalue_volcano_plot <- min(-log10(volcano_plot_data$pvalue))
 
 #Create the volcano plot (log2Fold change = 3, pvalue < 0.1)
 
-jpeg("../results/volcano_plot.png", width = 700, height = 500, res = 100)
+#jpeg("../results/volcano_plot.png", width = 700, height = 500, res = 100)
 
 EnhancedVolcano(volcano_plot_data,
                 lab = row.names(volcano_plot_data),
