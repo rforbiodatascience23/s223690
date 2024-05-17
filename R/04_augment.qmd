@@ -12,14 +12,18 @@ editor: visual
 library(tidyverse)
 ```
 
-#Load the data
+# Load the data
 
-```{r Load the data from 02_clean.qmd}
+```{r Load the data}
 setwd("C:/Users/marin/OneDrive/Documentos/GitHub/s223690/R")
 res <- read.delim("../data/DESeq2_results.tsv",
                          row.names = 1, 
                          stringsAsFactors = FALSE)
 ```
+
+# Check what are the deferentially expressed genes
+
+The threshold used in this case is a strict Log2FoldChange of 3 and a p-adj value superior than 0.1. These values are very strict since we want to know the most deferentially expressed values. The normal values are a Log2FoldChange of 2 and a p-adj value superior than 0.05.
 
 ```{r Check the DE genes}
 #Get the differentially expressed genes
@@ -28,9 +32,9 @@ de_genes <- subset(de_genes, log2FoldChange > 3 | log2FoldChange < -3)
 de_genes <- subset(de_genes, !is.na(padj))
 ```
 
-#Save data
+# Save data
 
-```{r Save the clean data}
+```{r Save the DE genes}
 # Define the path for the output .tsv file
 output_file_path <- "../data/de_genes.tsv"
 
@@ -39,9 +43,9 @@ write.table(de_genes, file = output_file_path, sep = "\t", quote = FALSE, row.na
 
 # Verify that the file has been saved
 if (file.exists(output_file_path)) {
-  cat("Clean data has ben saved to", output_file_path, "\n")
+  cat("DE genes has been saved to", output_file_path, "\n")
 } else {
-  cat("Failed to save Clean data has ben saved to", output_file_path, "\n")
+  cat("Failed to save DE genes in", output_file_path, "\n")
 }
 
 ```
