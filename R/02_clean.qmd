@@ -22,7 +22,7 @@ raw_data <- read_delim("../data/_raw/citotoxicity_genes_breast_cancer.tsv",
                        show_col_types = FALSE)
 ```
 
-#Rename the columns
+# Rename the columns
 
 ```{r Rename the columns}
 # Sample list (The names were copied directly from the webpage)
@@ -33,11 +33,7 @@ new_column_names <- gsub("\\bGSM\\w+\\s*", "", list)
 
 new_column_names <- gsub(" ", "_", new_column_names)
 
-
-# Print the cleaned list
-print(new_column_names)
-
-#Change the name of the columns with this one
+#Change the name of the columns with the new one
 clean_data <- as.data.frame(raw_data)
 colnames(clean_data) <- new_column_names
 
@@ -46,29 +42,31 @@ rownames(clean_data) <- clean_data[, 1]
 clean_data <- clean_data[, -1]
 ```
 
+# Check for NA in the dataset
+
 ```{r Check if there are na values in the data set}
 #Check if there are NaN or na values in the data set
 nan_counts <- unique(colSums(is.na(clean_data)))
 ```
 
+# Check how many genes have expression for each sample
+
 ```{r}
 # Count non-zero gene expressions for each sample
 non_zero_counts <- colSums(clean_data != 0)
 
-# Sample names indicating normal or tumor
+# Extract the sample names
 sample_names <- colnames(clean_data)
 
 # Color vector based on sample names containing "normal" or "tumor"
 colors <- ifelse(grepl("normal", sample_names), "#80CDC1", "#FDB863")
 
-# Load ggplot2 library
-library(ggplot2)
-
-# Create bar plot
-
+# Create bar plot and save it
 jpeg("../results/barplot_gene_count.png", width = 1100, height = 500, res = 100)
 
-ggplot(data.frame(Sample = names(non_zero_counts), Count = non_zero_counts), aes(x = Sample, y = Count, fill = colors)) +
+ggplot(data.frame(Sample = names(non_zero_counts), 
+                  Count = non_zero_counts), 
+       aes(x = Sample, y = Count, fill = colors)) +
     geom_bar(stat = "identity") +
     xlab("Sample") +
     ylab("Count of genes") +
@@ -78,6 +76,8 @@ ggplot(data.frame(Sample = names(non_zero_counts), Count = non_zero_counts), aes
 
 dev.off()
 ```
+
+# Save the clean data
 
 ```{r Save the clean data}
 # Define the path for the output .tsv file
@@ -91,9 +91,9 @@ write.table(clean_data, file = output_file_path,
 
 # Verify that the file has been saved
 if (file.exists(output_file_path)) {
-  cat("Clean data has ben saved to", output_file_path, "\n")
+  cat("Clean data has been saved to", output_file_path, "\n")
 } else {
-  cat("Failed to save Clean data has ben saves to", output_file_path, "\n")
+  cat("Failed to save Clean data in", output_file_path, "\n")
 }
 
 ```
