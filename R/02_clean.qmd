@@ -42,7 +42,7 @@ rownames(clean_data) <- clean_data[, 1]
 clean_data <- clean_data[, -1]
 ```
 
-# Check for NA in the dataset
+# Check for NA in the data set
 
 ```{r Check if there are na values in the data set}
 #Check if there are NaN or na values in the data set

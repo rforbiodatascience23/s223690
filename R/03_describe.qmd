@@ -14,12 +14,13 @@ library(DESeq2)
 library(umap)
 library(ggplot2)
 library(RColorBrewer)
+library(pheatmap)
 
 ```
 
-#Load the data
+# Load the data
 
-```{r Load the data from 02_clean.qmd}
+```{r Load the data}
 setwd("C:/Users/marin/OneDrive/Documentos/GitHub/s223690/R")
 clean_data <- read.delim("../data/clean_data.tsv", 
                          row.names = 1, 
@@ -27,7 +28,7 @@ clean_data <- read.delim("../data/clean_data.tsv",
 
 ```
 
-#Start the DESeq analysis
+# Preparation for the DESeq analysis
 
 ```{r Create the DESeq input (DESeq matrix)}
 # Set the sample names
@@ -42,8 +43,7 @@ DESeq_matrix <- data.frame(sampleName = sample_names,
                            fileName = t(clean_data),
                            condition = sample_condition)
 
-#Set the conditions so we can perform DESeq2 afterwards
-# Convert raw_data to a matrix
+# Convert clean_data to a matrix
 count_matrix <- as.matrix(clean_data)
 
 # Create a DESeqDataSet object. The round(count_matrix) help to have non-negative integers.
@@ -55,10 +55,12 @@ dds <- DESeqDataSetFromMatrix(countData = round(count_matrix),
 dds <- dds[ rowSums(counts(dds)) > 10, ]
 ```
 
-#Visual representation
+# Visual representation
+
+For the visual representation, we will use a PCA plot. Before performing the plot, it is necessary to do VST (Variance Stabilising Transformation) to guarantee a normalization and stabilize the variance across the genes.
 
 ```{r VST and PCA plot}
-#VST for the PCA plot
+#VST (Variance Stabilising Transformation) for the PCA plot
 dds <- estimateSizeFactors(dds)
 
 vst <- vst(dds, blind = FALSE)
@@ -80,6 +82,7 @@ pheatmap_distances <- pheatmap(sampleDistMatrix,
 
 #dev.off()
 
+#Perfom the PCA plot
 jpeg("../results/PCA.png", width = 600, height = 500, res = 100)
 
 plotPCA(vst)
@@ -87,25 +90,23 @@ plotPCA(vst)
 dev.off()
 
 #Add another way of performing the PCA using ggplot2
-# Assuming you have already calculated the vst values and stored them in 'vst'
-
-# Extract principal components
+# Extract principal components from the vst normalisation
 pca <- prcomp(t(assay(vst)))
 
-# Create a data frame with PC scores
-pca_data <- as.data.frame(pca$x[,1:2])  # Considering the first two PCs
-pca_data$condition <- as.factor(DESeq_matrix$condition)  # Ensure 'condition' is a factor
+# Create a data frame with PC scores considering the first principal components. The condition needs to be a factor.
+pca_data <- as.data.frame(pca$x[,1:2])
+pca_data$condition <- as.factor(DESeq_matrix$condition)
 
 # Plot using ggplot2
 ggplot(pca_data, aes(x = PC1, y = PC2)) +
   geom_point(aes(colour = condition),
              shape = 19,
              size = 2.5) +
-  labs(x = "PC1", y = "PC2", title = "PCA Plot using ggplot2")
+  labs(x = "PC1", y = "PC2", title = "PCA Plot")
 
 ```
 
-#Start the DESeq analysis
+# Start the DESeq analysis
 
 ```{r Perform DESeq2 analysis of the normalised counts}
 # Run DESeq2 analysis
@@ -116,9 +117,9 @@ res <- results(dds)
 res <- data.frame(res)
 ```
 
-#Save data
+# Save data
 
-```{r Save the clean data}
+```{r}
 # Define the path for the output .tsv file
 output_file_path <- "../data/DESeq2_results.tsv"
 
@@ -151,5 +152,4 @@ if (file.exists(output_file_path)) {
 } else {
   cat("Failed to save vst object to", output_file_path, "\n")
 }
-
 ```
