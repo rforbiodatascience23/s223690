@@ -31,7 +31,7 @@ download.file(original_path,
               method = "auto")
 ```
 
-#Transform the file from csv to tsv
+# Transform the file from csv to tsv
 
 ```{r}
 #This code separates the data with tabs and not comas
